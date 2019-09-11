@@ -46,7 +46,7 @@ public class ExtensionProviderImpl extends ExtensionProvider
 	@Override
 	public List<MenuItem> getMenuItems()
 	{
-		List<MenuItem> result = new ArrayList<MenuItem>();
+		List<MenuItem> result = new ArrayList<>();
 		result.add(new MenuLinkItem("cpa_0","View CPA Templates",ViewCPATemplatesPage.class));
 		result.add(new MenuLinkItem("cpa_1","Create CPA",CreateCPAPage.class));
 		return result;

@@ -63,7 +63,7 @@ public class RegisterCPATemplatePage extends BasePage
 
 		public RegisterCPATemplateForm(String id)
 		{
-			super(id,new CompoundPropertyModel<RegisterCPATemplateFormModel>(new RegisterCPATemplateFormModel()));
+			super(id,new CompoundPropertyModel<>(new RegisterCPATemplateFormModel()));
 			setMultiPart(true);
 			add(new TextField<String>("name").setLabel(new ResourceModel("lbl.name")));
 			add(new BootstrapFormComponentFeedbackBorder("cpaFeedback",createCPAFileField("cpaFile")));

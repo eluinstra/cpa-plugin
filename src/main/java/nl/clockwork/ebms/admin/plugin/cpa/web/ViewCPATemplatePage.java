@@ -30,7 +30,7 @@ public class ViewCPATemplatePage extends BasePage
 	public ViewCPATemplatePage(CPATemplate cpaTemplate, final ViewCPATemplatesPage responsePage)
 	{
 		add(new Label("name",cpaTemplate.getName()));
-		TextArea<String> cpaTemplate_ = new TextArea<String>("cpaTemplate",Model.of(cpaTemplate.getContent()));
+		TextArea<String> cpaTemplate_ = new TextArea<>("cpaTemplate",Model.of(cpaTemplate.getContent()));
 		cpaTemplate_.setEnabled(false);
 		add(cpaTemplate_);
 		add(new Link<Void>("back")

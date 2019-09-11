@@ -25,8 +25,8 @@ public class PartyInfo implements Serializable
 	private Integer id;
 	private String partyName;
 	private String partyId;
-	private List<Url> urls = new ArrayList<Url>();
-	private List<Certificate> certificates = new ArrayList<Certificate>();
+	private List<Url> urls = new ArrayList<>();
+	private List<Certificate> certificates = new ArrayList<>();
 	private boolean enabled;
 
 	public Integer getId()

@@ -80,7 +80,7 @@ public class Utils
 			@Override
 			public Iterator<String> getPrefixes(String namespaceURI)
 			{
-				ArrayList<String> result = new ArrayList<String>();
+				ArrayList<String> result = new ArrayList<>();
 	      if (namespaceURI.equals("http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd"))
 	        result.add("cpa");
 	      else if (namespaceURI.equals("http://www.w3.org/2000/09/xmldsig#"))

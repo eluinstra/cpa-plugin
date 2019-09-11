@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.xpath.XPath;
@@ -43,7 +44,7 @@ import nl.clockwork.ebms.admin.web.service.cpa.CPAsPage;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.service.CPAService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -107,7 +108,7 @@ public class CreateCPAPage extends BasePage
 
 		public CreateCPAForm(String id)
 		{
-			super(id,new CompoundPropertyModel<CreateCPAFormModel>(new CreateCPAFormModel()));
+			super(id,new CompoundPropertyModel<>(new CreateCPAFormModel()));
 			setMultiPart(true);
 			add(new BootstrapFormComponentFeedbackBorder("cpaTemplateFeedback",createCPATemplateChoice("cpaTemplate")));
 			add(new BootstrapFormComponentFeedbackBorder("cpaIdFeedback",new TextField<String>("cpaId").setLabel(new ResourceModel("lbl.cpaId")).setRequired(true)).setOutputMarkupId(true));
@@ -120,10 +121,10 @@ public class CreateCPAPage extends BasePage
 
 		private DropDownChoice<CPATemplate> createCPATemplateChoice(String id)
 		{
-			DropDownChoice<CPATemplate> result = new DropDownChoice<CPATemplate>(id,new LoadableDetachableCPATemplatesModel(),new ChoiceRenderer<CPATemplate>("name","id"));
+			DropDownChoice<CPATemplate> result = new DropDownChoice<>(id,new LoadableDetachableCPATemplatesModel(),new ChoiceRenderer<>("name","id"));
 			result.setLabel(new ResourceModel("lbl.cpaTemplate"));
 			result.setRequired(true);
-			result.add(new AjaxFormComponentUpdatingBehavior("onchange")
+			result.add(new AjaxFormComponentUpdatingBehavior("change")
 			{
 				private static final long serialVersionUID = 1L;
 
@@ -164,7 +165,7 @@ public class CreateCPAPage extends BasePage
 				@Override
 				protected void populateItem(final ListItem<PartyInfo> item)
 				{
-					item.setModel(new CompoundPropertyModel<PartyInfo>(item.getModelObject()));
+					item.setModel(new CompoundPropertyModel<>(item.getModelObject()));
 					item.add(createEnabledCheckBox("enabled"));
 					item.add(new BootstrapFormComponentFeedbackBorder("partyNameFeedback",new TextField<String>("partyName").setLabel(new ResourceModel("lbl.partyName")).setRequired(true))
 					{
@@ -199,7 +200,7 @@ public class CreateCPAPage extends BasePage
 		{
 			CheckBox result = new CheckBox(id);
 			result.setLabel(new ResourceModel("lbl.enabled"));
-			result.add(new AjaxFormComponentUpdatingBehavior("onchange")
+			result.add(new AjaxFormComponentUpdatingBehavior("change")
       {
 				private static final long serialVersionUID = 1L;
 
@@ -215,10 +216,10 @@ public class CreateCPAPage extends BasePage
 
 		private FormComponent<String> createPartyIdTextField(String id)
 		{
-			FormComponent<String> result = new TextField<String>(id);
+			FormComponent<String> result = new TextField<>(id);
 			result.setLabel(new ResourceModel("lbl.partyId"));
 			result.setRequired(true);
-			result.add(new AjaxFormComponentUpdatingBehavior("onchange")
+			result.add(new AjaxFormComponentUpdatingBehavior("change")
 			{
 				private static final long serialVersionUID = 1L;
 
@@ -265,7 +266,7 @@ public class CreateCPAPage extends BasePage
 				@Override
 				protected void populateItem(ListItem<Url> item)
 				{
-					item.setModel(new CompoundPropertyModel<Url>(item.getModelObject()));
+					item.setModel(new CompoundPropertyModel<>(item.getModelObject()));
 					item.add(new Label("transportId"));
 					item.add(new BootstrapFormComponentFeedbackBorder("urlFeedback",createUrlTextField("url",item.getModelObject().getTransportId())));
 				}
@@ -300,7 +301,7 @@ public class CreateCPAPage extends BasePage
 				@Override
 				protected void populateItem(ListItem<Certificate> item)
 				{
-					item.setModel(new CompoundPropertyModel<Certificate>(item.getModelObject()));
+					item.setModel(new CompoundPropertyModel<>(item.getModelObject()));
 					item.add(new Label("id"));
 					item.add(new BootstrapFormComponentFeedbackBorder("fileFeedback",createCertificateFileUploadField("file",item.getModelObject().getId())));
 				}
@@ -403,16 +404,12 @@ public class CreateCPAPage extends BasePage
 		private void generateCPAId(CreateCPAFormModel model, Document document, XPath xpath) throws XPathExpressionException
 		{
 			String cpaId = (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/@cpa:cpaid",document,XPathConstants.STRING);
-			model.setCpaId(cpaId + "_" + toString(model.getPartyInfos()) + UUID.randomUUID());
+			model.setCpaId(cpaId + "_" + toString(model.getPartyInfos()) + "_" + UUID.randomUUID());
 		}
 
 		private String toString(List<PartyInfo> partyInfos)
 		{
-			String result = "";
-			for (PartyInfo partyInfo : partyInfos)
-				if (!StringUtils.isEmpty(partyInfo.getPartyId()))
-					result += partyInfo.getPartyId() + "_";
-			return result;
+			return partyInfos.stream().filter(p -> !StringUtils.isEmpty(p.getPartyId())).map(p -> p.getPartyId()).collect(Collectors.joining("_"));
 		}
 
 		private String getPartyName(Integer id, Document document, XPath xpath) throws XPathExpressionException
@@ -427,7 +424,7 @@ public class CreateCPAPage extends BasePage
 
 		private ArrayList<Url> getURLs(Integer id, Document document, XPath xpath) throws XPathExpressionException
 		{
-			ArrayList<Url> result = new ArrayList<Url>();
+			ArrayList<Url> result = new ArrayList<>();
 			NodeList nodeList = (NodeList)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]//cpa:Transport/@cpa:transportId",document,XPathConstants.NODESET);
 			for (int i = 0; i < nodeList.getLength(); i++)
 			{
@@ -440,7 +437,7 @@ public class CreateCPAPage extends BasePage
 
 		private ArrayList<Certificate> getCertificateFiles(Integer id, Document document, XPath xpath) throws XPathExpressionException
 		{
-			ArrayList<Certificate> result = new ArrayList<Certificate>();
+			ArrayList<Certificate> result = new ArrayList<>();
 			NodeList nodeList = (NodeList)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]//cpa:Certificate/@cpa:certId",document,XPathConstants.NODESET);
 			for (int i = 0; i < nodeList.getLength(); i++)
 				result.add(new Certificate(nodeList.item(i).getNodeValue()));
@@ -456,7 +453,7 @@ public class CreateCPAPage extends BasePage
 		private String cpaId;
 		private Date startDate = new Date();
 		private Date endDate = new Date(new Date().getTime() + (365L * 24 * 60 * 60 * 1000));
-		private List<PartyInfo> partyInfos = new ArrayList<PartyInfo>();
+		private List<PartyInfo> partyInfos = new ArrayList<>();
 
 		public CPATemplate getCpaTemplate()
 		{
