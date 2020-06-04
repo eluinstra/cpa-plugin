@@ -17,40 +17,21 @@ package nl.clockwork.ebms.admin.plugin.cpa.model;
 
 import org.apache.wicket.util.io.IClusterable;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
+@RequiredArgsConstructor
 public class CPAElement implements IClusterable
 {
 	private static final long serialVersionUID = 1L;
-	private long id;
-	private String name;
-	private String xpathQuery;
-	public CPAElement(long id, String name, String xpathQuery)
-	{
-		this.id = id;
-		this.name = name;
-		this.xpathQuery = xpathQuery;
-	}
-	public long getId()
-	{
-		return id;
-	}
-	public void setId(long id)
-	{
-		this.id = id;
-	}
-	public String getName()
-	{
-		return name;
-	}
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-	public String getXpathQuery()
-	{
-		return xpathQuery;
-	}
-	public void setXpathQuery(String xpathQuery)
-	{
-		this.xpathQuery = xpathQuery;
-	}
+	long id;
+	@NonNull
+	String name;
+	@NonNull
+	String xpathQuery;
 }

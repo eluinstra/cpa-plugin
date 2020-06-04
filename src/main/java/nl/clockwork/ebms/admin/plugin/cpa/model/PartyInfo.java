@@ -19,62 +19,26 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Data
+@NoArgsConstructor
 public class PartyInfo implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private Integer id;
-	private String partyName;
-	private String partyId;
-	private List<Url> urls = new ArrayList<>();
-	private List<Certificate> certificates = new ArrayList<>();
-	private boolean enabled;
-
-	public Integer getId()
-	{
-		return id;
-	}
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
-	public String getPartyName()
-	{
-		return partyName;
-	}
-	public void setPartyName(String partyName)
-	{
-		this.partyName = partyName;
-	}
-	public String getPartyId()
-	{
-		return partyId;
-	}
-	public void setPartyId(String partyId)
-	{
-		this.partyId = partyId;
-	}
-	public List<Url> getURLs()
-	{
-		return urls;
-	}
-	public void setUrls(List<Url> urls)
-	{
-		this.urls = urls;
-	}
-	public List<Certificate> getCertificates()
-	{
-		return certificates;
-	}
-	public void setCertificates(List<Certificate> certificates)
-	{
-		this.certificates = certificates;
-	}
-	public boolean isEnabled()
-	{
-		return enabled;
-	}
-	public void setEnabled(boolean enabled)
-	{
-		this.enabled = enabled;
-	}
+	Integer id;
+	@NonNull
+	String partyName;
+	@NonNull
+	String partyId;
+	@NonNull
+	List<Url> urls = new ArrayList<>();
+	@NonNull
+	List<Certificate> certificates = new ArrayList<>();
+	boolean enabled;
 }

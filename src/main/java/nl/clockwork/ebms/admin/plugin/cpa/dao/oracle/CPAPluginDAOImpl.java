@@ -22,7 +22,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class CPAPluginDAOImpl extends AbstractCPAPluginDAO
 {
-
 	public CPAPluginDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
@@ -32,13 +31,12 @@ public class CPAPluginDAOImpl extends AbstractCPAPluginDAO
 	public String selectCPATemplatesQuery(long first, long count)
 	{
 		return "select * from (" +
-			"select t.*, rownum rn from (" +
-			CPATemplateRowMapper.getBaseQuery() +
-			" order by name" +
-			") t" +
-			" where rownum < " + (first + 1 + count) +
+				"select t.*, rownum rn from (" +
+					"select * from cpa_template" +
+					" order by name" +
+				") t" +
+				" where rownum < " + (first + 1 + count) +
 			") where rn >= " + (first + 1)
 		;
 	}
-
 }

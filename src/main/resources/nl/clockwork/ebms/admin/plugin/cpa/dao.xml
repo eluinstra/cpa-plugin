@@ -21,9 +21,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="cpaPluginDAO" class="nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAOFactory">
-		<property name="dataSource" ref="ebMSDataSource"/>
-		<property name="transactionTemplate" ref="ebMSTransactionTemplate"/>
-		<property name="jdbcTemplate" ref="ebMSJdbcTemplate"/>
+		<constructor-arg name="dataSource" ref="ebMSDataSource"/>
+		<constructor-arg name="transactionTemplate" ref="ebMSTransactionTemplate"/>
+		<constructor-arg name="jdbcTemplate" ref="ebMSJdbcTemplate"/>
 	</bean>
 
 </beans>

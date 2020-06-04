@@ -24,6 +24,8 @@ import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.resource.IResourceStream;
 
+import lombok.val;
+
 public class DownloadCPATemplateLink extends Link<CPATemplate>
 {
 	private static final long serialVersionUID = 1L;
@@ -36,16 +38,15 @@ public class DownloadCPATemplateLink extends Link<CPATemplate>
 	@Override
 	public void onClick()
 	{
-		CPATemplate cpaTemplate = getModelObject();
-		IResourceStream resourceStream = new StringResourceStream(cpaTemplate.getContent(),"text/xml");
+		val cpaTemplate = getModelObject();
+		val resourceStream = StringResourceStream.of(cpaTemplate.getContent(),"text/xml");
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(createRequestHandler(cpaTemplate.getName(),resourceStream));
 	}
 
 	private ResourceStreamRequestHandler createRequestHandler(String name, IResourceStream resourceStream)
 	{
 		return new ResourceStreamRequestHandler(resourceStream)
-		.setFileName("cpa." + name + ".xml")
-		.setContentDisposition(ContentDisposition.ATTACHMENT);
+				.setFileName(name + ".xml")
+				.setContentDisposition(ContentDisposition.ATTACHMENT);
 	}
-
 }

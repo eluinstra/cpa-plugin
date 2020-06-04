@@ -15,16 +15,13 @@
  */
 package nl.clockwork.ebms.admin.plugin.cpa.web;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.val;
 import nl.clockwork.ebms.admin.web.ExtensionProvider;
 import nl.clockwork.ebms.admin.web.menu.MenuItem;
 import nl.clockwork.ebms.admin.web.menu.MenuLinkItem;
 
 public class ExtensionProviderImpl extends ExtensionProvider
 {
-
 	@Override
 	public String getSpringConfigurationFile()
 	{
@@ -32,9 +29,9 @@ public class ExtensionProviderImpl extends ExtensionProvider
 	}
 
 	@Override
-	public String getHSQLDBFile()
+	public String getDbMigrationLocation()
 	{
-		return "/nl/clockwork/ebms/admin/plugin/cpa/hsqldb/hsqldb.sql";
+		return "classpath:/nl/clockwork/ebms/admin/plugin/cpa/db/migration";
 	}
 
 	@Override
@@ -44,12 +41,11 @@ public class ExtensionProviderImpl extends ExtensionProvider
 	}
 
 	@Override
-	public List<MenuItem> getMenuItems()
+	public MenuItem createSubMenu(MenuItem parent, int index, String name)
 	{
-		List<MenuItem> result = new ArrayList<>();
-		result.add(new MenuLinkItem("cpa_0","View CPA Templates",ViewCPATemplatesPage.class));
-		result.add(new MenuLinkItem("cpa_1","Create CPA",CreateCPAPage.class));
+		val result = new MenuItem(parent,"" + index,name);
+		result.getChildren().add(new MenuLinkItem("cpa_0","View CPA Templates",ViewCPATemplatesPage.class));
+		result.getChildren().add(new MenuLinkItem("cpa_1","Create CPA",CreateCPAPage.class));
 		return result;
 	}
-
 }

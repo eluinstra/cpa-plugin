@@ -17,22 +17,22 @@ package nl.clockwork.ebms.admin.plugin.cpa.web;
 
 import java.util.Iterator;
 
-import nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAO;
-import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
-
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAO;
+import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor(staticName = "of")
 public class CPATemplateDataProvider implements IDataProvider<CPATemplate>
 {
 	private static final long serialVersionUID = 1L;
-	private CPAPluginDAO cpaPluginDAO;
+	CPAPluginDAO cpaPluginDAO;
 
-	public CPATemplateDataProvider(CPAPluginDAO cpaPluginDAO)
-	{
-		this.cpaPluginDAO = cpaPluginDAO;
-	}
-	
 	@Override
 	public Iterator<? extends CPATemplate> iterator(long first, long count)
 	{
@@ -55,5 +55,4 @@ public class CPATemplateDataProvider implements IDataProvider<CPATemplate>
 	public void detach()
 	{
 	}
-
 }

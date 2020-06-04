@@ -17,11 +17,12 @@ package nl.clockwork.ebms.admin.plugin.cpa.web;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 
+import lombok.val;
 import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
 import nl.clockwork.ebms.admin.web.BasePage;
+import nl.clockwork.ebms.admin.web.Link;
 
 public class ViewCPATemplatePage extends BasePage
 {
@@ -30,19 +31,13 @@ public class ViewCPATemplatePage extends BasePage
 	public ViewCPATemplatePage(CPATemplate cpaTemplate, final ViewCPATemplatesPage responsePage)
 	{
 		add(new Label("name",cpaTemplate.getName()));
-		TextArea<String> cpaTemplate_ = new TextArea<>("cpaTemplate",Model.of(cpaTemplate.getContent()));
+		val cpaTemplate_ = new TextArea<String>("cpaTemplate",PropertyModel.of(cpaTemplate,"content"));
 		cpaTemplate_.setEnabled(false);
 		add(cpaTemplate_);
-		add(new Link<Void>("back")
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void onClick()
-			{
-				setResponsePage(responsePage);
-			}
-		});
+		add(Link.<Void>builder()
+				.id("back")
+				.onClick(() -> setResponsePage(responsePage))
+				.build());
 	}
 
 	@Override

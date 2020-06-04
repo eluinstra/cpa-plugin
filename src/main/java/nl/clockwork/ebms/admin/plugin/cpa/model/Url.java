@@ -17,31 +17,17 @@ package nl.clockwork.ebms.admin.plugin.cpa.model;
 
 import java.io.Serializable;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
+@RequiredArgsConstructor
 public class Url implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private String transportId;
-	private String url;
-
-	public Url(String transportId, String url)
-	{
-		this.transportId = transportId;
-		this.url = url;
-	}
-	public String getTransportId()
-	{
-		return transportId;
-	}
-	public void setTransportId(String transportId)
-	{
-		this.transportId = transportId;
-	}
-	public String getURL()
-	{
-		return url;
-	}
-	public void setUrl(String url)
-	{
-		this.url = url;
-	}
+	String transportId;
+	String url;
 }

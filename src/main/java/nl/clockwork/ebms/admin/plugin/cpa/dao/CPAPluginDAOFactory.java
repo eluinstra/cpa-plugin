@@ -15,15 +15,30 @@
  */
 package nl.clockwork.ebms.admin.plugin.cpa.dao;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.AbstractDAOFactory.DefaultDAOFactory;
 
+@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public class CPAPluginDAOFactory extends DefaultDAOFactory<CPAPluginDAO>
 {
-	protected TransactionTemplate transactionTemplate;
-	protected JdbcTemplate jdbcTemplate;
+	@NonNull
+	TransactionTemplate transactionTemplate;
+	@NonNull
+	JdbcTemplate jdbcTemplate;
+
+	public CPAPluginDAOFactory(DataSource dataSource, @NonNull TransactionTemplate transactionTemplate, @NonNull JdbcTemplate jdbcTemplate)
+	{
+		super(dataSource);
+		this.transactionTemplate = transactionTemplate;
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	@Override
 	public Class<CPAPluginDAO> getObjectType()
@@ -60,15 +75,4 @@ public class CPAPluginDAOFactory extends DefaultDAOFactory<CPAPluginDAO>
 	{
 		return new nl.clockwork.ebms.admin.plugin.cpa.dao.mssql.CPAPluginDAOImpl(transactionTemplate,jdbcTemplate);
 	}
-
-	public void setTransactionTemplate(TransactionTemplate transactionTemplate)
-	{
-		this.transactionTemplate = transactionTemplate;
-	}
-	
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
-	{
-		this.jdbcTemplate = jdbcTemplate;
-	}
-
 }

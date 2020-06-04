@@ -20,30 +20,21 @@ import java.util.List;
 
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
+@RequiredArgsConstructor
 public class Certificate implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private String id;
-	private List<FileUpload> file;
-
-	public Certificate(String id)
-	{
-		this.id = id;
-	}
-	public String getId()
-	{
-		return id;
-	}
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	public List<FileUpload> getFile()
-	{
-		return file;
-	}
-	public void setFile(List<FileUpload> file)
-	{
-		this.file = file;
-	}
+	@NonNull
+	String id;
+	@NonFinal
+	List<FileUpload> file;
 }

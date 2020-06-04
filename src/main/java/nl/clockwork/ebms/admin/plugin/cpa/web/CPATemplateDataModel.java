@@ -15,36 +15,36 @@
  */
 package nl.clockwork.ebms.admin.plugin.cpa.web;
 
-import nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAO;
-import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static io.vavr.Predicates.instanceOf;
 
 import org.apache.wicket.model.LoadableDetachableModel;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAO;
+import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor(staticName = "of")
 public class CPATemplateDataModel extends LoadableDetachableModel<CPATemplate>
 {
 	private static final long serialVersionUID = 1L;
-	private CPAPluginDAO cpaPluginDAO;
-	private final long id;
+	CPAPluginDAO cpaPluginDAO;
+	long id;
 
 	public CPATemplateDataModel(CPAPluginDAO ebMSDAO, CPATemplate cpaTemplate)
 	{
 		this(ebMSDAO,cpaTemplate.getId());
 	}
-	public CPATemplateDataModel(CPAPluginDAO cpaPluginDAO, long id)
-	{
-		this.cpaPluginDAO = cpaPluginDAO;
-		this.id = id;
-	}
-
-	protected CPAPluginDAO getCpaPluginDAO()
-	{
-		return cpaPluginDAO;
-	}
 
 	@Override
 	protected CPATemplate load()
 	{
-		return getCpaPluginDAO().findCPATemplate(id);
+		return cpaPluginDAO.findCPATemplate(id);
 	}
 
 	@Override
@@ -56,15 +56,10 @@ public class CPATemplateDataModel extends LoadableDetachableModel<CPATemplate>
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj == this)
-			return true;
-		else if (obj == null)
-			return false;
-		else if (obj instanceof CPATemplateDataModel)
-		{
-			CPATemplateDataModel other = (CPATemplateDataModel)obj;
-			return id == other.id;
-		}
-		return false;
+		return Match(obj).of(
+				Case($(this),true),
+				Case($(null),false),
+				Case($(instanceOf(CPATemplateDataModel.class)),o -> id == o.id),
+				Case($(),false));
 	}
 }

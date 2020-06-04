@@ -15,27 +15,34 @@
  */
 package nl.clockwork.ebms.admin.plugin.cpa.web;
 
-import nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAO;
-import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
-import nl.clockwork.ebms.admin.web.BasePage;
-import nl.clockwork.ebms.admin.web.BootstrapFeedbackPanel;
-import nl.clockwork.ebms.admin.web.OddOrEvenIndexStringModel;
-import nl.clockwork.ebms.admin.web.PageClassLink;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.admin.plugin.cpa.dao.CPAPluginDAO;
+import nl.clockwork.ebms.admin.plugin.cpa.model.CPATemplate;
+import nl.clockwork.ebms.admin.web.Action;
+import nl.clockwork.ebms.admin.web.BasePage;
+import nl.clockwork.ebms.admin.web.BootstrapFeedbackPanel;
+import nl.clockwork.ebms.admin.web.Button;
+import nl.clockwork.ebms.admin.web.Link;
+import nl.clockwork.ebms.admin.web.OddOrEvenIndexStringModel;
+import nl.clockwork.ebms.admin.web.PageClassLink;
+import nl.clockwork.ebms.admin.web.WicketApplication;
+
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ViewCPATemplatesPage extends BasePage
 {
 	private class CPATemplateDataView extends DataView<CPATemplate>
@@ -57,65 +64,54 @@ public class ViewCPATemplatesPage extends BasePage
 		@Override
 		protected void populateItem(final Item<CPATemplate> item)
 		{
-			final CPATemplate cpaTemplate = item.getModelObject();
-			item.add(createViewLink(cpaTemplate));
-			item.add(new DownloadCPATemplateLink("downloadCPATemplate",cpaTemplate));
+			val o = item.getModelObject();
+			item.add(createViewLink(o));
+			item.add(new DownloadCPATemplateLink("downloadCPATemplate",o));
 			item.add(createDeleteButton("delete"));
-			item.add(AttributeModifier.replace("class",new OddOrEvenIndexStringModel(item.getIndex())));
+			item.add(AttributeModifier.replace("class",OddOrEvenIndexStringModel.of(item.getIndex())));
 		}
 
 		private Link<Void> createViewLink(final CPATemplate cpaTemplate)
 		{
-			Link<Void> link = new Link<Void>("view")
-			{
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick()
-				{
-					setResponsePage(new ViewCPATemplatePage(cpaTemplate,ViewCPATemplatesPage.this));
-				}
-			};
-			link.add(new Label("name",cpaTemplate.getName()));
-			return link;
+			val result = Link.<Void>builder()
+					.id("view")
+					.onClick(() -> setResponsePage(new ViewCPATemplatePage(cpaTemplate,ViewCPATemplatesPage.this)))
+					.build();
+			result.add(new Label("name",cpaTemplate.getName()));
+			return result;
 		}
 
 		private Button createDeleteButton(String id)
 		{
-			Button result = new Button(id,new ResourceModel("cmd.delete"))
+			Action onSubmit = () ->
 			{
-				private static final long serialVersionUID = 1L;
-	
-				@Override
-				public void onSubmit()
+				try
 				{
-					try
-					{
-						CPATemplate cpaTemplate = (CPATemplate)getParent().getDefaultModelObject();
-						cpaPluginDAO.deleteCPATemplate(cpaTemplate.getId());
-						setResponsePage(new ViewCPATemplatesPage());
-					}
-					catch (Exception e)
-					{
-						logger.error("",e);
-						error(e.getMessage());
-					}
+					val cpaTemplate = (CPATemplate)getParent().getDefaultModelObject();
+					cpaPluginDAO.deleteCPATemplate(cpaTemplate.getId());
+					setResponsePage(new ViewCPATemplatesPage());
+				}
+				catch (Exception e)
+				{
+					log.error("",e);
+					error(e.getMessage());
 				}
 			};
+			val result = new Button(id,new ResourceModel("cmd.delete"),onSubmit);
 			result.add(AttributeModifier.replace("onclick","return confirm('" + getLocalizer().getString("confirm",this) + "');"));
 			return result;
 		}
 
 	}
 	private static final long serialVersionUID = 1L;
-	protected transient Log logger = LogFactory.getLog(this.getClass());
 	@SpringBean(name="cpaPluginDAO")
-	private CPAPluginDAO cpaPluginDAO;
-	@SpringBean(name="maxItemsPerPage")
-	private Integer maxItemsPerPage;
+	CPAPluginDAO cpaPluginDAO;
+	@NonNull
+	final Integer maxItemsPerPage;
 
 	public ViewCPATemplatesPage()
 	{
+		this.maxItemsPerPage = WicketApplication.get().getMaxItemsPerPage();
 		add(new BootstrapFeedbackPanel("feedback"));
 		add(new ViewCPATemplatesForm("form"));
 	}
@@ -133,11 +129,10 @@ public class ViewCPATemplatesPage extends BasePage
 		public ViewCPATemplatesForm(String id)
 		{
 			super(id);
-			WebMarkupContainer container = new WebMarkupContainer("container");
+			val container = new WebMarkupContainer("container");
 			add(container);
-			container.add(new CPATemplateDataView("cpaTemplates",new CPATemplateDataProvider(cpaPluginDAO)));
+			container.add(new CPATemplateDataView("cpaTemplates",CPATemplateDataProvider.of(cpaPluginDAO)));
 			add(new PageClassLink("new",RegisterCPATemplatePage.class));
 		}
 	}
-	
 }
