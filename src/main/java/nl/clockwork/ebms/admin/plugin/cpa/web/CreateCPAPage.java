@@ -52,7 +52,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import io.vavr.Function3;
+import io.vavr.Function4;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -146,14 +149,14 @@ public class CreateCPAPage extends BasePage
 						model.getPartyInfos().addAll(getPartyInfos(document,xpath));
 						model.setCpaId(generateCPAId(model,document,xpath));
 					}
-					t.add(getPage().get("feedback"));
-					t.add(getPage().get("form"));
 				}
 				catch (Exception e)
 				{
 					log.error("",e);
 					error(e.getMessage());
 				}
+				t.add(getPage().get("feedback"));
+				t.add(getPage().get("form"));
 			};
 			result.add(new AjaxFormComponentUpdatingBehavior("change",onUpdate));
 			return result;
@@ -391,29 +394,25 @@ public class CreateCPAPage extends BasePage
 
 		private List<PartyInfo> getPartyInfos(Document document, XPath xpath) throws XPathExpressionException
 		{
+			Function3<Integer,Document,XPath,Either<XPathExpressionException,PartyInfo>> createPartyInfo = (i,d,x) ->
+					Try.<Either<XPathExpressionException,PartyInfo>>of(() -> Either.<XPathExpressionException,PartyInfo>right(createPartyInfo(i,d,x)))
+					.getOrElseGet(e -> Either.<XPathExpressionException,PartyInfo>left((XPathExpressionException)e));
 			val nodeList = (NodeList)xpath.evaluate("/cpa:CollaborationProtocolAgreement//cpa:PartyInfo",document,XPathConstants.NODESET);
-			val result = Eithers.sequenceRight(
+			return Eithers.sequenceRight(
 					IntStream.range(1,nodeList.getLength() + 1).boxed()
-					.map(i -> createPartyInfo(i,document,xpath)));
-			return result.getOrElseThrow(e -> e);
+					.map(i -> createPartyInfo.apply(i,document,xpath)))
+					.getOrElseThrow(e -> e);
 		}
 
-		private Either<XPathExpressionException,PartyInfo> createPartyInfo(int id, Document document, XPath xpath)
+		private PartyInfo createPartyInfo(int id, Document document, XPath xpath) throws XPathExpressionException
 		{
-			try
-			{
-				val result = new PartyInfo();
-				result.setId(id);
-				result.setPartyName(getPartyName(id,document,xpath));
-				result.setPartyId(getPartyId(id,document,xpath));
-				result.setUrls(getURLs(id,document,xpath));
-				result.setCertificates(getCertificateFiles(id,document,xpath));
-				return Either.right(result);
-			}
-			catch (XPathExpressionException e)
-			{
-				return Either.left(e);
-			}
+			val result = new PartyInfo();
+			result.setId(id);
+			result.setPartyName(getPartyName(id,document,xpath));
+			result.setPartyId(getPartyId(id,document,xpath));
+			result.setUrls(getURLs(id,document,xpath));
+			result.setCertificates(getCertificateFiles(id,document,xpath));
+			return result;
 		}
 
 		private String generateCPAId(CreateCPAFormData model, Document document, XPath xpath) throws XPathExpressionException
@@ -429,7 +428,7 @@ public class CreateCPAPage extends BasePage
 
 		private String getPartyName(Integer id, Document document, XPath xpath) throws XPathExpressionException
 		{
-			return (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]/@cpa:partyName",document,XPathConstants.STRING);
+			return (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[[[" + id + "]/@cpa:partyName",document,XPathConstants.STRING);
 		}
 
 		private String getPartyId(Integer id, Document document, XPath xpath) throws XPathExpressionException
@@ -439,23 +438,19 @@ public class CreateCPAPage extends BasePage
 
 		private List<Url> getURLs(Integer id, Document document, XPath xpath) throws XPathExpressionException
 		{
+			Function4<Integer,String,Document,XPath,Either<XPathExpressionException,Url>> createUrl = (i,t,d,x) ->
+					Try.<Either<XPathExpressionException,Url>>of(() -> Either.<XPathExpressionException,Url>right(createUrl(i,t,d,x)))
+					.getOrElseGet(e -> Either.<XPathExpressionException,Url>left((XPathExpressionException)e));
 			val nodeList = (NodeList)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]//cpa:Transport/@cpa:transportId",document,XPathConstants.NODESET);
 			return Eithers.sequenceRight(IntStream.range(0,nodeList.getLength()).boxed()
-					.map(i -> createUrl(id,nodeList.item(i).getNodeValue(),document,xpath)))
+					.map(i -> createUrl.apply(id,nodeList.item(i).getNodeValue(),document,xpath)))
 					.getOrElseThrow(e -> e);
 		}
 
-		private Either<XPathExpressionException,Url> createUrl(Integer id, String transportId, Document document, XPath xpath)
+		private Url createUrl(Integer id, String transportId, Document document, XPath xpath) throws XPathExpressionException
 		{
-			try
-			{
-				val url = (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]/cpa:Transport[@cpa:transportId = '" + transportId + "']/cpa:TransportReceiver/cpa:Endpoint[1]/@cpa:uri",document,XPathConstants.STRING);
-				return Either.right(new Url(transportId,url));
-			}
-			catch (XPathExpressionException e)
-			{
-				return Either.left(e);
-			}
+			val url = (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]/cpa:Transport[@cpa:transportId = '" + transportId + "']/cpa:TransportReceiver/cpa:Endpoint[1]/@cpa:uri",document,XPathConstants.STRING);
+			return new Url(transportId,url);
 		}
 
 		private ArrayList<Certificate> getCertificateFiles(Integer id, Document document, XPath xpath) throws XPathExpressionException
