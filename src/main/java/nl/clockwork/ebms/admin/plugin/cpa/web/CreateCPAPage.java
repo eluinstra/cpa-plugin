@@ -428,7 +428,7 @@ public class CreateCPAPage extends BasePage
 
 		private String getPartyName(Integer id, Document document, XPath xpath) throws XPathExpressionException
 		{
-			return (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[[[" + id + "]/@cpa:partyName",document,XPathConstants.STRING);
+			return (String)xpath.evaluate("/cpa:CollaborationProtocolAgreement/cpa:PartyInfo[" + id + "]/@cpa:partyName",document,XPathConstants.STRING);
 		}
 
 		private String getPartyId(Integer id, Document document, XPath xpath) throws XPathExpressionException
