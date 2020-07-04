@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.admin.plugin.cpa.web;
 
 import lombok.val;
+import nl.clockwork.ebms.admin.plugin.cpa.MainConfig;
 import nl.clockwork.ebms.admin.web.ExtensionProvider;
 import nl.clockwork.ebms.admin.web.menu.MenuItem;
 import nl.clockwork.ebms.admin.web.menu.MenuLinkItem;
@@ -23,9 +24,9 @@ import nl.clockwork.ebms.admin.web.menu.MenuLinkItem;
 public class ExtensionProviderImpl extends ExtensionProvider
 {
 	@Override
-	public String getSpringConfigurationFile()
+	public Class<?> getSpringConfigurationClass()
 	{
-		return "classpath:nl/clockwork/ebms/admin/plugin/cpa/applicationContext.xml";
+		return MainConfig.class;
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public class ExtensionProviderImpl extends ExtensionProvider
 	@Override
 	public MenuItem createSubMenu(MenuItem parent, int index, String name)
 	{
-		val result = new MenuItem(parent,"" + index,name);
+		val result = new MenuItem(parent,String.valueOf(index),name);
 		result.getChildren().add(new MenuLinkItem("cpa_0","View CPA Templates",ViewCPATemplatesPage.class));
 		result.getChildren().add(new MenuLinkItem("cpa_1","Create CPA",CreateCPAPage.class));
 		return result;

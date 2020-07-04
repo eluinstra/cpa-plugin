@@ -141,6 +141,31 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!--plugin>
+				<groupId>com.querydsl</groupId>
+				<artifactId>querydsl-maven-plugin</artifactId>
+				<version>4.3.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>export</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
+					<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/ebms</jdbcUrl>
+					<packageName>nl.clockwork.ebms.admin.plugin.cpa.querydsl.model</packageName>
+					<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.hsqldb</groupId>
+						<artifactId>hsqldb</artifactId>
+						<version>2.5.0</version>
+					</dependency>
+				</dependencies>
+			</plugin-->
 			<plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
